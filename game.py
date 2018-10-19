@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import doctest
+
 from map import rooms
 import string
 
@@ -17,15 +17,10 @@ def remove_punct(text):
     >>> remove_punct(",go!So.?uTh")
     'goSouTh'
     """
-
-    word = ""
-    for letter in text:
-        if letter.isalpha() == True:
-            word = word + letter
-        elif letter == " ":
-            word = word + letter
-    return word
-     # The pass statement does nothing. Replace it with the body of your function.
+    translator = str.maketrans('', '', string.punctuation)
+    text = text.translate(translator)
+    return text
+    
     
     
 def remove_spaces(text):
@@ -44,10 +39,15 @@ def remove_spaces(text):
     >>> remove_spaces("   ")
     ''
     """
-   
-    text1 = text.lstrip()
-    text2 = text1.rstrip()
-    return text2
+    pass
+
+    if text == "":
+        return text
+    else:
+        text = text.strip()
+        return text
+
+
 
 
 def normalise_input(user_input):
@@ -62,11 +62,12 @@ def normalise_input(user_input):
     >>> normalise_input("HELP!!!!!!!")
     'help'
     """
+    pass
+
     user_input = remove_punct(user_input)
     user_input = remove_spaces(user_input)
-    user = user_input.lower()
-
-    return user
+    user_input = str(user_input).lower()
+    return user_input
 
     
 def display_room(room):
@@ -89,11 +90,11 @@ def display_room(room):
     Note: <BLANKLINE> here means that doctest should expect a blank line.
     """
 
-    print("\n" + room["name"].upper() + "\n")
-    print(room["description"] + "\n")
-
-    
-    # pass # The pass statement does nothing. Replace it with the body of your function.
+    print ()
+    print (room["name"].upper())
+    print ()
+    print (room ["description"])
+    print ()
 
     
 def exit_leads_to(exits, direction):
@@ -108,9 +109,11 @@ def exit_leads_to(exits, direction):
     >>> exit_leads_to(rooms["Tutor"]["exits"], "west")
     'Reception'
     """
-    room = rooms[exits[direction]]
-    return room["name"]
-    
+ 
+    room_direction_leads_to = exits[direction]
+    leads_to = rooms[room_direction_leads_to]["name"]
+    return leads_to
+   
     
 
 def print_menu_line(direction, leads_to):
@@ -126,11 +129,15 @@ def print_menu_line(direction, leads_to):
     >>> print_menu_line("south", "MJ and Simon's room")
     Go SOUTH to MJ and Simon's room.
     """
+    pass
     
-    print("Go " + direction.upper() + " to " +  leads_to + ".")
-        
+    print ("Go " + direction.upper() + " to " + leads_to + ".")
+    
+
+
 
 def print_menu(exits):
+    
     """This function displays the menu of available exits to the player. The
     argument exits is a dictionary of exits as exemplified in map.py. The
     menu should, for each exit, call the function print_menu_line() to print
@@ -145,13 +152,11 @@ def print_menu(exits):
     Go SOUTH to MJ and Simon's room.
     Where do you want to go?
     """
-    print("You can:")
-    for key in exits:
-        direction = key
-        leads_to = exit_leads_to(exits, direction)
-        print_menu_line(direction, leads_to)
-        
     
+    print("You can:"),
+
+    for ex in exits:
+        print_menu_line(ex, exit_leads_to(exits,ex))
 
     print("Where do you want to go?")
     
@@ -173,11 +178,12 @@ def is_valid_exit(exits, user_input):
     >>> is_valid_exit(rooms["Parking"]["exits"], "east")
     True
     """
-    valid = False
-    for key in exits:
-        if key == user_input:
-            valid = True
-    return valid
+    pass
+
+    for ex in exits:
+        if user_input == ex:
+            return True    
+    return False
 
 
 def menu(exits):
@@ -192,27 +198,21 @@ def menu(exits):
 
     # Repeat until the player enter a valid choice
     while True:
+       
         print_menu(exits)
-        user = input("")
-        user = normalise_input(user)
-        
-        if is_valid_exit(exits,user) == True:
-            return user
-        else:
-            print("Invalid Location")
-        
-    
-        
-        # COMPLETE THIS PART:
-        
-        # Display menu
 
         # Read player's input
+        user_input=input()
 
         # Normalise the input
+        user_input = normalise_input(user_input)
+        print (user_input)
 
         # Check if the input makes sense (is valid exit)
             # If so, return the player's choice
+        is_exit = is_valid_exit(exits, user_input)
+        if is_exit == True:
+            return user_input
 
 
 
@@ -229,13 +229,14 @@ def move(exits, direction):
     >>> move(rooms["Reception"]["exits"], "west") == rooms["Office"]
     False
     """
-    room = rooms[exits[direction]]
-    return room
+
+    for ex in exits:
+        if ex == direction:
+            return rooms[exits[direction]] 
 
 
 # This is the entry point of our program
 def main():
-    doctest.testmod()
     # Start game at the reception
     current_room = rooms["Reception"]
 
@@ -246,12 +247,12 @@ def main():
 
         # What are the possible exits from the current room?
         exits = current_room["exits"]
+
         # Show the menu with exits and ask the player
         direction = menu(exits)
 
         # Move the protagonist, i.e. update the current room
         current_room = move(exits, direction)
-        
 
 
 # Are we being run as a script? If so, run main().
